@@ -112,8 +112,9 @@ try:
         print overallRating, cultureAndValues, workLife, seniorManagement, compAndBenefits, careerOpportunities
 
         comments = []
-        for n in range(1, 999):
+        for n in range(1, 99999):
             p_url = url.replace(".htm", "_P%d.htm"%n)
+            p_url += "?filter.defaultEmploymentStatuses=false&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME&filter.employmentStatus=CONTRACT&filter.employmentStatus=INTERN&filter.employmentStatus=FREELANCE&filter.employmentStatus=UNKNOWN"
             p = get_page(p_url)
             p_soup = BeautifulSoup(p)
             comments += p_soup.findAll("div", "hreview")
@@ -122,10 +123,14 @@ try:
             if "<li class='next'> <span class='disabled'><i>" in p:
                 break
 
+        print len(comments), "comments"
         n = 1
         for comment in comments:
+            print n
+            # open("w.html", "w").write(str(comment))
             time_soup = comment.find("time")
             comment_time = time_soup.get("datetime")
+            print "comment_time:", comment_time
 
             span_soup = comment.find("span", "authorInfo tbl hideHH")
             s = span_soup.getText()
@@ -138,6 +143,7 @@ try:
             elif "Former" in a:
                 former_current = "Former"
             job_title = b.strip()
+            print "former_current:", former_current
 
             div_soup = comment.find("div", "cell reviewBodyCell")
             working = div_soup.find("p", "notranslate").getText()
@@ -146,28 +152,47 @@ try:
                 intern_full_time = "full-time"
             elif "intern" in working:
                 intern_full_time = "intern"
+            print "intern_full_time:", intern_full_time
             r = re.findall(r"\((.*?)\)", working)
             years_of_working = "N/A"
             if r:
                 years_of_working = r[0]
+            # print "years_of_working:", years_of_working
+
 
             recommends = outlook = aprroves = "N/A"
-            div_soup = comment.find("div", "cell padBotLg")
-            if div_soup:
-                divs = div_soup.findAll("div", "cell")
-                recommends = divs[0].getText()
-                outlook = divs[1].getText()
-                aprroves = divs[2].getText()
-                if not recommends:
-                    recommends = "N/A"
-                if not outlook:
-                    outlook = "N/A"
-                if not aprroves:
-                    aprroves = "N/A"
+
+            # div_soup = comment.find("div", "cell padBotLg")
+            # if div_soup:
+            #     divs = div_soup.findAll("div", "cell")
+            #     recommends = divs[0].getText()
+            #     outlook = divs[1].getText()
+            #     aprroves = divs[2].getText()
+            #     if not recommends:
+            #         recommends = "N/A"
+            #     if not outlook:
+            #         outlook = "N/A"
+            #     if not aprroves:
+            #         aprroves = "N/A"
+
+            recommends_soup = comment.find("div", "flex-grid recommends")
+            if recommends_soup:
+                divs = recommends_soup.findAll("div", "tightLt col span-1-3")
+                for div in divs:
+                    text = div.getText()
+                    if "Recommend" in text:
+                        recommends = text
+                    if "Outlook" in text:
+                        outlook = text
+                    if "CEO" in text:
+                        aprroves = text
+            # print recommends, outlook, aprroves
+
 
             span_soup = comment.find("span", "gdStars gdRatings sm margRt")
             span_soup = span_soup.find("span", "value-title")
             overall_rating = span_soup.get("title")
+            # print "overall_rating:", overall_rating
 
             culture_and_values = work_life = senior_management = comp_and_benefits = career_opportunities = "N/A"
             ul_soup = comment.find("ul", "undecorated")
@@ -186,16 +211,21 @@ try:
                         comp_and_benefits = value
                     elif "Career" in t:
                         career_opportunities = value
+            # print culture_and_values, work_life, senior_management, comp_and_benefits, career_opportunities
+
 
             h2_soup = comment.find("h2", "h2 summary strong tightTop")
             comment_title = h2_soup.find("span", "summary").getText()
+            # print "comment_title:", comment_title
 
             div_soup = comment.find("div", "tbl fill prosConsAdvice")
             rows = div_soup.findAll("div", "row")
             pros = cons = advice = "N/A"
             for row in rows:
-                t = row.find("div", "cell padRt padBot strong top p").getText()
-                c = row.find("p").getText()
+                # t = row.find("div", "cell padRt padBot strong top p").getText()
+                # c = row.find("p").getText()
+                t = row.find("p", "tightVert").getText()
+                c = row.find("p", "noMargVert").getText()
                 if "Pros" in t:
                     pros = c
                 elif "Cons" in t:
@@ -203,15 +233,11 @@ try:
                 elif "Advice" in t:
                     advice = c
 
-            print n
-            print comment_time
-            # print former_current, job_title, intern_full_time, years_of_working
-            # print recommends, outlook, aprroves
-            print overall_rating, culture_and_values, work_life, senior_management, comp_and_benefits, career_opportunities
-            # print comment_title
-            # print pros
-            # print cons
-            # print advice
+            # print "pros:", pros
+            # print "cons:", cons
+            # print "advice:", advice
+
+
             print 
 
             j = 2
