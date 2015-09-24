@@ -49,8 +49,21 @@ print p
 
 
 try:
+
+    exist_codes = []
+    i = 2
+    while True:
+        i += 1
+        code = sheet2["B%d"%i].value
+        if not code:
+            break
+        if code not in exist_codes:
+            exist_codes.append(code)
+
+
     i = 0
     while True:
+        print "========================================"
         i += 1
         url = sheet1["C%d"%i].value
         if not url:
@@ -59,6 +72,10 @@ try:
             continue
         name = sheet1["B%d"%i].value
         stock_code = sheet1["A%d"%i].value
+
+        if stock_code in exist_codes:
+            print name, "exist!!!!!!!"
+            continue
 
         # url = "http://www.glassdoor.com/Reviews/ZTE-Reviews-E40056.htm"
         # url = "http://www.glassdoor.com/Reviews/XCMG-Reviews-E662352.htm"
@@ -112,7 +129,7 @@ try:
         print overallRating, cultureAndValues, workLife, seniorManagement, compAndBenefits, careerOpportunities
 
         comments = []
-        for n in range(1, 99999):
+        for n in range(1, 6):
             p_url = url.replace(".htm", "_P%d.htm"%n)
             p_url += "?filter.defaultEmploymentStatuses=false&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME&filter.employmentStatus=CONTRACT&filter.employmentStatus=INTERN&filter.employmentStatus=FREELANCE&filter.employmentStatus=UNKNOWN"
             p = get_page(p_url)
