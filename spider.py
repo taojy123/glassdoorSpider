@@ -7,7 +7,7 @@ import traceback
 import time
 import json
 from openpyxl import Workbook
-from  openpyxl.reader.excel  import  load_workbook
+from openpyxl.reader.excel  import  load_workbook
 from BeautifulSoup import BeautifulSoup
 
  
