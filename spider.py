@@ -129,7 +129,7 @@ try:
         print overallRating, cultureAndValues, workLife, seniorManagement, compAndBenefits, careerOpportunities
 
         comments = []
-        for n in range(1, 6):
+        for n in range(1, 999999):
             p_url = url.replace(".htm", "_P%d.htm"%n)
             p_url += "?filter.defaultEmploymentStatuses=false&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME&filter.employmentStatus=CONTRACT&filter.employmentStatus=INTERN&filter.employmentStatus=FREELANCE&filter.employmentStatus=UNKNOWN"
             p = get_page(p_url)
