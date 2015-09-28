@@ -141,6 +141,11 @@ try:
                 break
 
         print len(comments), "comments"
+
+        if not len(comments):
+            open("zero.txt", "a").write(name + "\n")
+            continue
+
         n = 1
         for comment in comments:
             print n
