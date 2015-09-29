@@ -42,7 +42,7 @@ wb2 = load_workbook('output.xlsx')
 sheet1 = wb1.get_sheet_by_name(wb1.sheetnames[0])
 sheet2 = wb2.get_sheet_by_name(wb2.sheetnames[0])
 
-
+# GSM_GD_RA1@126.com  /  pkugsm
 url = "https://www.glassdoor.com/profile/ajax/loginAjax.htm?username=GSM_GD_RA1%40126.com&password=pkugsm"
 p = get_page(url)
 print p
@@ -151,7 +151,10 @@ try:
             print n
             # open("w.html", "w").write(str(comment))
             time_soup = comment.find("time")
-            comment_time = time_soup.get("datetime")
+            if time_soup:
+                comment_time = time_soup.get("datetime")
+            else:
+                comment_time = "N/A"
             print "comment_time:", comment_time
 
             span_soup = comment.find("span", "authorInfo tbl hideHH")
