@@ -6,6 +6,7 @@ import re
 import traceback
 import time
 import json
+import gc
 from openpyxl import Workbook
 from openpyxl.reader.excel  import  load_workbook
 from BeautifulSoup import BeautifulSoup
@@ -22,7 +23,7 @@ def get_page(url, data=None):
     print url
     resp = None
     n = 0
-    while n < 3:
+    while n < 10:
         n = n + 1
         try:
             resp = opener.open(url, data, timeout=8)
@@ -30,7 +31,7 @@ def get_page(url, data=None):
             page = page.decode("gbk", "replace").encode("gbk", "replace")
             return page
         except:
-            #traceback.print_exc()
+            traceback.print_exc()
             time.sleep(2)
             print "Try after 2 seconds ..."
             continue
@@ -130,15 +131,23 @@ try:
 
         comments = []
         for n in range(1, 999999):
-            p_url = url.replace(".htm", "_P%d.htm"%n)
-            p_url += "?filter.defaultEmploymentStatuses=false&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME&filter.employmentStatus=CONTRACT&filter.employmentStatus=INTERN&filter.employmentStatus=FREELANCE&filter.employmentStatus=UNKNOWN"
-            p = get_page(p_url)
-            p_soup = BeautifulSoup(p)
-            comments += p_soup.findAll("div", "hreview")
-            if "<li class='next'>" not in p:
-                break
-            if "<li class='next'> <span class='disabled'><i>" in p:
-                break
+            gc.collect()
+            try:
+                p_url = url.replace(".htm", "_P%d.htm"%n)
+                p_url += "?filter.defaultEmploymentStatuses=false&filter.employmentStatus=REGULAR&filter.employmentStatus=PART_TIME&filter.employmentStatus=CONTRACT&filter.employmentStatus=INTERN&filter.employmentStatus=FREELANCE&filter.employmentStatus=UNKNOWN"
+                p = get_page(p_url)
+                p_soup = BeautifulSoup(p)
+                comments += p_soup.findAll("div", "hreview")
+
+                # for comment in p_soup.findAll("div", "hreview"):
+                #     add_comment(comment)
+
+                if "<li class='next'>" not in p:
+                    break
+                if "<li class='next'> <span class='disabled'><i>" in p:
+                    break
+            except:
+                print '------'
 
         print len(comments), "comments"
 
@@ -148,6 +157,7 @@ try:
 
         n = 1
         for comment in comments:
+            gc.collect()
             print n
             # open("w.html", "w").write(str(comment))
             time_soup = comment.find("time")
@@ -299,9 +309,11 @@ try:
                 sheet2["AA%d"%j].value = cons
                 sheet2["AB%d"%j].value = advice
                 break
-
-            wb2.save("output.xlsx")
             n += 1
+
+
+        wb2.save("output.xlsx")
+        
 except:
     traceback.print_exc()
 
