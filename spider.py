@@ -60,9 +60,10 @@ sheet2 = wb2.get_sheet_by_name(wb2.sheetnames[0])
 j = 2
 while True:
     j += 1
-    if sheet2["A%d"%j].value:
-        continue
-    break
+    if not sheet2["A%d"%j].value:
+        break
+
+print 'start from:', j
 
 
 # GSM_GD_RA1@126.com  /  pkugsm
@@ -94,7 +95,11 @@ try:
 
         p = get_page(url)
 
-        code = re.findall(r"-E(\w+).htm", url)[0]
+        rs = re.findall(r"-E(\w+).htm", url)
+        if not rs:
+            print url, 'not found code!!!'
+            continue
+        code = rs[0]
         print code
 
         p_soup = BeautifulSoup(p)
